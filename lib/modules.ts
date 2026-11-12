@@ -1,0 +1,16 @@
+export const moduleDefinitions = [
+  ["EMR", "Electronic Medical Records", "Clinical", "Clinical documentation, orders, results and longitudinal patient context.", ["PATIENT_REGISTRATION", "IAM"]],
+  ["PATIENT_REGISTRATION", "Patient Registration", "Clinical", "MPI, demographics, encounter creation and duplicate detection.", ["MDM", "IAM"]],
+  ["LIS", "Laboratory Information System", "Clinical", "Orders, specimen lifecycle, result validation and reporting.", ["PATIENT_REGISTRATION", "INTEGRATION_ENGINE"]],
+  ["PACS", "Radiology & PACS", "Clinical", "Imaging orders, modality worklist and diagnostic reporting.", ["RIS", "INTEGRATION_ENGINE"]],
+  ["RIS", "Radiology Information System", "Clinical", "Radiology scheduling, worklists and reporting workflow.", ["PATIENT_REGISTRATION"]],
+  ["PHARMACY", "Pharmacy Management", "Clinical", "Formulary, stock, dispensing and medication safety controls.", ["PATIENT_REGISTRATION", "INVENTORY"]],
+  ["BILLING", "Billing Management", "Financial", "Charge capture, tariffs, billing and payment workflows.", ["PATIENT_REGISTRATION", "MDM"]],
+  ["INSURANCE_TPA", "Insurance & TPA Management", "Financial", "Eligibility, preauthorization, claims and remittance workflows.", ["BILLING"]],
+  ["INVENTORY", "Inventory & Procurement", "Financial", "Item masters, purchase orders, stores and consumption controls.", ["MDM"]],
+  ["MDM", "Master Data Management", "Enterprise", "Governed reference data across hospitals and facilities.", []],
+  ["INTEGRATION_ENGINE", "Enterprise Integration Engine", "Enterprise", "Secure orchestration for HL7, FHIR, DICOM and external APIs.", ["IAM"]],
+  ["IAM", "Identity & Access Management", "Enterprise", "Role-based access, SSO, lifecycle and privileged access controls.", []],
+  ["AUDIT_COMPLIANCE", "Audit & Compliance", "Enterprise", "Audit trails, retention, configurable regulatory assessments and evidence.", ["IAM"]],
+  ["DR_BCP", "Disaster Recovery & Business Continuity", "Enterprise", "Recovery objectives, backups, failover and continuity operations.", ["INTEGRATION_ENGINE"]],
+] as const;

@@ -1,0 +1,6 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { defectSchema } from "@/lib/validation";
+
+export async function POST(request: Request, context: { params: Promise<{ id: string }> }) { const { id } = await context.params; const parsed = defectSchema.safeParse(await request.json()); if (!parsed.success) return NextResponse.json({ error: "Invalid defect", details: parsed.error.flatten() }, { status: 400 }); const defect = await prisma.defect.create({ data: { organizationId: id, ...parsed.data } }); return NextResponse.json({ defect }, { status: 201 }); }
+export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) { const { id } = await context.params; const body = await request.json() as { defectId?: string; status?: string; resolution?: string }; if (!body.defectId || !["OPEN", "IN_PROGRESS", "CLOSED", "REJECTED"].includes(body.status ?? "")) return NextResponse.json({ error: "defectId and valid status are required" }, { status: 400 }); const defect = await prisma.defect.update({ where: { id: body.defectId, organizationId: id }, data: { status: body.status, resolution: body.resolution } }); return NextResponse.json({ defect }); }
