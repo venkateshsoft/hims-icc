@@ -26,6 +26,8 @@ const initialChecklist: ChecklistItem[] = [
 
 function Badge({children, tone="gray"}:{children:React.ReactNode;tone?:string}){return <span className={`badge ${tone}`}>{children}</span>}
 function pctTone(n:number){return n>=80?"green":n>=60?"teal":n>=40?"orange":"red"}
+function useSavedRecords(kind:string){const [records,setRecords]=useState<Record<string,any>[]>([]);useEffect(()=>{try{const saved=localStorage.getItem(`hims-icc-${kind}s`);if(saved)setRecords(JSON.parse(saved));}catch{} const onCreated=(event:Event)=>{const detail=(event as CustomEvent).detail;if(detail?.kind===kind)setRecords(current=>[...current,detail.record]);};window.addEventListener("hims-record-created",onCreated);return()=>window.removeEventListener("hims-record-created",onCreated);},[kind]);return records;}
+function SavedRecordsPanel({title,subtitle,records,kind}:{title:string;subtitle:string;records:Record<string,any>[];kind:string}){return <div className="card" style={{marginBottom:18}}><div className="card-head"><div><h2>{title}</h2><p>{subtitle}</p></div><Badge tone="teal">{records.length} saved</Badge></div><div className="saved-grid">{records.slice().reverse().map(r=><div className="saved-record" key={r.id}><strong>{r.name}</strong><span>{kind==="organization"?(r.type||"Healthcare organization"):(kind==="module"?(r.domain||"Clinical"):(r.date||"Date not set"))}</span><span>{r.owner||"Unassigned"}</span></div>)}</div></div>}
 
 export default function Home(){
   const [view,setView]=useState<View>("dashboard"); const [projects,setProjects]=useState<ProjectRecord[]>([]); const [items,setItems]=useState<ChecklistItem[]>(initialChecklist); const [search,setSearch]=useState(""); const [toast,setToast]=useState(""); const [mobile,setMobile]=useState(false);
@@ -54,7 +56,7 @@ function quickCreateKind(action?:string):QuickCreateKind|undefined{
   if(value.includes("add milestone")) return "milestone";
   return undefined;
 }
-function PageHead({eyebrow,title,desc,action}:{eyebrow:string;title:string;desc:string;action?:string}){const kind=quickCreateKind(action);return <div className="header-row"><div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1><p>{desc}</p></div>{action&&(kind?<QuickCreate action={action} kind={kind}/>:<button className="primary">{action}</button>)}</div>}
+function PageHead({eyebrow,title,desc,action}:{eyebrow:string;title:string;desc:string;action?:string}){const kind=quickCreateKind(action);const records=useSavedRecords(kind&&kind!=="project"?kind:"__none__");return <><div className="header-row"><div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1><p>{desc}</p></div>{action&&(kind?<QuickCreate action={action} kind={kind}/>:<button className="primary">{action}</button>)}</div>{kind&&kind!=="project"&&records.length>0&&<SavedRecordsPanel title={`Saved ${kind} records`} subtitle="Created in this workspace" records={records} kind={kind}/>}</>}
 function QuickCreate({action,kind}:{action:string;kind:QuickCreateKind}){
   const [open,setOpen]=useState(false); const [error,setError]=useState("");
   const [form,setForm]=useState<Record<string,string>>({name:"",owner:"",date:"",city:"",type:"",beds:"",domain:"Clinical",category:"Project initiation",priority:"High",description:""});
